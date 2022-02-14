@@ -1,4 +1,4 @@
-# trainingtwo
+# training
 
 ## Project setup
 ```
