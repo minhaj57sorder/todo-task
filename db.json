@@ -13,9 +13,9 @@
       "reminder": true
     },
     {
-      "id": 5708,
-      "text": "Second test",
-      "day": "Friday",
+      "id": 4,
+      "text": "tasks text4",
+      "day": "monday",
       "reminder": false
     }
   ]

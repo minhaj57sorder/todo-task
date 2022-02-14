@@ -1,182 +1,142 @@
 <template>
   <div class="container">
-    <Header
-      title="Tasks here"
-      @show-hide-addtask="showHideForm"
-      :showhide="showhide"
-    />
-    <div v-show="showhide">
-      <AddTask @add-task="addNewTask" />
+    <Header title="Task tracker" />
+    <div>
+      <AddTask @add-newTask="addNewTask" />
     </div>
-    <Tasks
-      @toggle-reminder="onToggle"
-      @delete-task="deleteTask"
-      :tasks="tasks"
-    />
+    <Tasks :tasks="tasks" @toggle-reminder="toggleReminder" @remove-task="removeTask" />
   </div>
 </template>
 
 <script>
-import Header from "./components/Header";
-import Tasks from "./components/Tasks";
-import AddTask from "./components/AddTask";
-
+import Header from "./components/Header"
+import Tasks from "./components/Tasks"
+import AddTask from "./components/AddTask"
 export default {
-  name: "App",
-  components: {
+  name: 'App',
+  components:{
     Header,
     Tasks,
-    AddTask,
+    AddTask
   },
-  data() {
-    return {
-      tasks: [],
-      showhide: false,
-    };
+  data(){
+    return{
+      tasks:[]
+    }
   },
-  methods: {
-    async fetchTasks() {
-      const res = await fetch("api/tasks");
-      const data = await res.json();
-      return data;
-    },
-    async fetchTask(id) {
-      const res = await fetch(`api/tasks/${id}`);
-      const data = await res.json();
-      return data;
-    },
-    async addNewTask(task) {
-      const res = await fetch(`api/tasks`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
+  methods:{
+    async addNewTask(newTask){
+      const res = await fetch(`http://localhost:5000/tasks`,{
+        method:"POST",
+        headers:{
+          "Content-type":"application/json"
         },
-        body: JSON.stringify(task),
-      });
-      if (res.status === 201) {
-        this.tasks = [...this.tasks, task];
+        body:JSON.stringify(newTask)
+      })
+      if(res.status === 201){
+        this.tasks = [...this.tasks,newTask]
       }
     },
-    async deleteTask(id) {
-      const res = await fetch(`api/tasks/${id}`, {
-        method: "DELETE",
-      });
-      if (res.status === 200) {
-        this.tasks = this.tasks.filter((task) => task.id !== id);
-      }
+    async fetchTasks(){
+      const res = await fetch('http://localhost:5000/tasks')
+      const data = await res.json()
+      return data
     },
-    async onToggle(id) {
+    async fetchTask(id){
+      const res = await fetch(`http://localhost:5000/tasks/${id}`)
+      const data = await res.json()
+      return data
+    },
+    async toggleReminder(id){
       const taskToToggle = await this.fetchTask(id);
-      const data = { ...taskToToggle, reminder: !taskToToggle.reminder };
-      const res = await fetch(`api/tasks/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
+      const toggledTask = {...taskToToggle,reminder:!taskToToggle.reminder}
+      const res = await fetch(`http://localhost:5000/tasks/${id}`,{
+        method:"PUT",
+        headers:{
+          "Content-type":"application/json"
         },
-        body: JSON.stringify(data),
-      });
-      if (res.status === 200) {
-        this.tasks = this.tasks.map((task) =>
-          task.id === id ? { ...data } : task
-        );
+        body:JSON.stringify(toggledTask)
+      })
+      if(res.status === 200){
+        this.tasks = this.tasks.map(task=>task.id===id?{...toggledTask}:task)
       }
     },
-    showHideForm() {
-      this.showhide = !this.showhide;
-    },
+    async removeTask(id){
+      const res = await fetch(`http://localhost:5000/tasks/${id}`,{
+        method:"DELETE",
+      })
+      if(res.status === 200){
+        this.tasks = this.tasks.filter(task=>task.id!==id)
+      }
+    }
   },
-  async created() {
-    this.tasks = await this.fetchTasks();
-  },
-};
+  async created(){
+    this.tasks = await this.fetchTasks()
+  }
+}
 </script>
 
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap");
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  margin-top: 0px;
+  display: flex;
+  justify-content: center;
 }
-
-body {
-  font-family: "Poppins", sans-serif;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.container {
-  max-width: 500px;
-  margin: 30px auto;
-  overflow: auto;
-  min-height: 300px;
-  border: 1px solid steelblue;
-  padding: 30px;
+.container{
+  min-width:350px;
+  border: 1px solid rgb(77, 77, 77);
   border-radius: 5px;
+  min-height: 250px;
+  padding: 15px;
 }
-
-.header {
+.btn{
+  padding:15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  color: White;
+  border: none;
+  border-radius: 4px;
+}
+.btn-block{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+header{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
-
-.task {
-  background: #f4f4f4;
-  margin: 5px;
-  padding: 10px 20px;
+.task{
+  background-color: gainsboro;
+  padding:5px;
+  margin-bottom: 10px;
+}
+.task h4{
+  font-size: 1.2rem;
+  margin: 4px;
+  margin-left: 2px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.task .cross{
+  color:red;
+  font-style: normal;
+  font-size: 0.9rem;
   cursor: pointer;
 }
-
-.task.reminder {
-  border-left: 5px solid green;
+.task p{
+  margin: 4px;
+  margin-left: 2px;
+  font-size: 0.8rem;
 }
-
-.task h3 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.add-form {
-  margin-bottom: 40px;
-}
-
-.form-control {
-  margin: 20px 0;
-}
-
-.form-control label {
-  display: block;
-}
-
-.form-control input {
-  width: 100%;
-  height: 40px;
-  margin: 5px;
-  padding: 3px 7px;
-  font-size: 17px;
-}
-
-.form-control-check {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.form-control-check label {
-  flex: 1;
-}
-
-.form-control-check input {
-  flex: 2;
-  height: 20px;
-}
-
-footer {
-  margin-top: 30px;
-  text-align: center;
+.reminder{
+  border-left: 4px solid green;
 }
 </style>

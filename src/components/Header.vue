@@ -1,30 +1,18 @@
 <template>
     <header>
-        <h2>{{title}}</h2>
-        <Button @show-hide-addtask="$emit('show-hide-addtask')" :btnTxt="showhide?'close':'Add'" :color="showhide?'red':'green'" />
+        <h3>{{title}}</h3>
+        <Button color="green" btnText="Add" />
     </header>
 </template>
-
 <script>
-import Button from './Button'
+import Button from "./Button"
 export default {
-    name: 'Header',
-    props: {
-        title:String,
-        showhide:Boolean,
-        },
-    components: {
-        Button,
+    name:"Header",
+    components:{
+        Button
     },
-    emits:['show-hide-addtask']
+    props:{
+        title:String
+    }
 }
-
 </script>
-
-<style scoped>
-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-</style>
